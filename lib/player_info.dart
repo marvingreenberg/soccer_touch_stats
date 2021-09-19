@@ -1,0 +1,28 @@
+import './player.dart';
+
+var playerInfo = {
+  4: Player('Oliver', 'Svenburg', 4),
+  9: Player('Xavier', 'Johnston', 9),
+  11: Player('Daniel', 'Bollman', 11),
+  13: Player('Zachary', 'Rader', 13),
+  15: Player('Tai', 'Bhalla', 15),
+  17: Player('Thomas', 'Wilson', 17, nickname: 'Mac'),
+  19: Player('Harrison', 'Greenberg', 19, nickname: 'Hendo'),
+  21: Player('Peter', 'Kalitka', 21),
+  24: Player('Logan', 'Graham', 24),
+  25: Player('Charles', 'Russell', 25),
+  26: Player('Tyler', 'Foti', 26),
+  27: Player('Charlie', 'Taylor', 27),
+  29: Player('Griffin', 'Lusk', 29),
+  30: Player('Alexander', 'Perine', 30),
+  31: Player('Jack', 'Garwood', 31),
+  33: Player('Oliver', 'Frandano', 33),
+  36: Player('Lucas', 'Wendel', 36),
+  42: Player('David', "O'Malley", 42),
+  43: Player('Noah', 'Gropper', 43),
+  48: Player('Elias', 'Homer', 48),
+  55: Player('John', 'Biggle', 55, nickname: 'Harrison'),
+  57: Player('Mohamed', 'Ahmed', 57),
+  67: Player('Mr Jersey', '67', 98, jersey: 67),
+  99: Player('Mr Jersey', '13', 99, jersey: 13),
+};
