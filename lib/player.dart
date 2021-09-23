@@ -1,4 +1,4 @@
-import './game.dart';
+import './common.dart';
 
 class Player {
   final String firstName;
@@ -6,6 +6,13 @@ class Player {
   final String nickname;
   final int jersey;
   final int number;
+
+  int passes = 0;
+  var counts = {
+    EndCondition.goal: 0,
+    EndCondition.shot: 0,
+    EndCondition.turnOver: 0
+  };
 
   // Set playTime on subout
   var playTime = {Half.first: 0.0, Half.second: 0.0};
@@ -25,5 +32,14 @@ class Player {
 
   subOut(double timeIn) {
     timeOut = timeIn;
+  }
+
+  addPass() {
+    passes += 1;
+  }
+
+  addEndCondition(EndCondition kind) {
+    if (kind == EndCondition.stopPlay) return;
+    counts[kind] = (counts[kind] ?? 0) + 1;
   }
 }

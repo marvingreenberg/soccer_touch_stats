@@ -1,10 +1,36 @@
+// ignore_for_file: avoid_print
+import 'dart:async';
 import 'package:flutter/material.dart';
-import './game.dart';
+import './common.dart';
 
-// 20% longer than the half to account for stop time
+const oneSecond = Duration(seconds: 1);
+
 // Start warning three minutes before end of half
 const int totalTimerRunTimeSeconds = (lengthOfHalfMinutes + 10) * 60;
 const int startWarningAfterSeconds = (lengthOfHalfMinutes - 3) * 60;
+const zeroDuration = Duration(seconds: 0);
+
+class TimeBounds {
+  DateTime? _start;
+  DateTime? _end;
+
+  void start() {
+    _start = DateTime.now();
+  }
+
+  void end() {
+    _end = DateTime.now();
+  }
+
+  Duration get duration {
+    if (_start == null) return zeroDuration;
+    return (_end ?? DateTime.now()).difference(_start!);
+  }
+}
+
+String padSeconds(int seconds) {
+  return (seconds + 100).toString().substring(1, 3);
+}
 
 class GameTimer extends StatefulWidget {
   final Function? warnNearEndOfHalf;
@@ -20,53 +46,51 @@ class GameTimer extends StatefulWidget {
   State createState() => _TimerState();
 }
 
-String padSeconds(int seconds) {
-  return (seconds + 100).toString().substring(1, 3);
-}
+class _TimerState extends State<GameTimer> {
+  Map<Half, TimeBounds> periods = {
+    Half.first: TimeBounds(),
+    Half.second: TimeBounds(),
+  };
+  Half gameHalf = Half.first;
+  String _timerDisplay = '00:00';
+  bool isRunning = false;
 
-class _TimerState extends State<GameTimer> with TickerProviderStateMixin {
-  late AnimationController _controller;
-  Duration? offset;
-  int targetTimeSeconds = totalTimerRunTimeSeconds;
-  Half? currentHalf;
-
-  _TimerState() {
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: totalTimerRunTimeSeconds),
-    );
-  }
+  _TimerState();
   void stop() {
-    if (_controller.duration != null) {
-      offset = _controller.duration! * _controller.value;
-    }
-    _controller.stop(canceled: false);
+    isRunning = false;
+    var tb = periods[gameHalf];
+    if (tb == null) return;
+    tb.end();
+    gameHalf = Half.second;
   }
 
-  void start(Half half) {
-    offset = _controller.duration;
-    _controller.reset();
+  // repeatedly pressing start changes the start
+  void startTimer() {
+    if (isRunning) return;
+    print('******** starting ********');
+    TimeBounds tb =
+        periods.containsKey(gameHalf) ? periods[gameHalf]! : TimeBounds();
+    tb.start();
+    periods[gameHalf] = tb;
+
+    Timer.periodic(oneSecond, (Timer t) {
+      print('******** timer tick ********');
+      if (!isRunning) t.cancel();
+      updateTimerDisplay();
+    });
+
+    setState(() {
+      isRunning = true;
+    });
   }
 
-  String get timerDisplayString {
-    Duration elapsed = _controller.duration ?? const Duration(seconds: 0);
-
+  void updateTimerDisplay() {
+    Duration elapsed = periods.values
+        .fold(zeroDuration, (Duration d, TimeBounds tb) => d + tb.duration);
     int minutes = (elapsed.inSeconds / 60).floor();
     int seconds = elapsed.inSeconds.remainder(60);
-    return '$minutes:${padSeconds(seconds)}';
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _controller.reverse();
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed ||
-          status == AnimationStatus.dismissed) {
-        if (widget.warnNearEndOfHalf != null) {
-          widget.warnNearEndOfHalf!();
-        }
-      }
+    setState(() {
+      _timerDisplay = '$minutes:${padSeconds(seconds)}';
     });
   }
 
@@ -74,42 +98,22 @@ class _TimerState extends State<GameTimer> with TickerProviderStateMixin {
   void didUpdateWidget(GameTimer oldWidget) {
     print('something happened');
     super.didUpdateWidget(oldWidget);
-    // if (widget.secondsRemaining != oldWidget.secondsRemaining) {
-    //   setState(() {
-    //     duration = new Duration(seconds: widget.secondsRemaining);
-    //     _controller.dispose();
-    //     _controller = new AnimationController(
-    //       vsync: this,
-    //       duration: duration,
-    //     );
-    //     _controller.reverse(from: widget.secondsRemaining.toDouble());
-    //     _controller.addStatusListener((status) {
-    //       if (status == AnimationStatus.completed) {
-    //         widget.whenTimeExpires();
-    //       } else if (status == AnimationStatus.dismissed) {
-    //         print("Animation Complete");
-    //       }
-    //     });
-    //   });
-    // }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: AnimatedBuilder(
-            animation: _controller,
-            builder: (_, Widget? child) {
-              return TextButton(
-                onPressed: () => _controller.reset(),
-                child: Text(timerDisplayString, style: widget.timerStyle),
-              );
-            }));
+    print('*********** $_timerDisplay ***********');
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          IconButton(
+            onPressed: startTimer,
+            color: isRunning ? Colors.black : Colors.red,
+            iconSize: 24.0,
+            icon: const Icon(Icons.play_circle),
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          ),
+          Text(_timerDisplay, style: widget.timerStyle)
+        ]);
   }
 }

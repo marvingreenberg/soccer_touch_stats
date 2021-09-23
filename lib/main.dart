@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import './player_info.dart';
 import './timer.dart';
+import './game.dart';
+import './common.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,42 +41,44 @@ class TouchPage extends StatefulWidget {
   State<TouchPage> createState() => _TouchPageState();
 }
 
-const playersOnField = [
-  [15, 21, 57],
-  [33, 11, 19],
-  [98, 25, 33, 98],
-  [13]
-];
-
-enum EndCondition { shot, goal, turnOver, stopPlay }
-
 class _TouchPageState extends State<TouchPage> {
   final _touches = [];
-  String _possession = '';
+  int? _possession;
+  String _possessionDescription = '';
+  bool _isRunning = false;
+  var game = Game('aGame', arlington2005RedPlayers);
 
   void _touchedBy(int playerNumber) {
     setState(() {
+      _isRunning = true;
+      _possession = playerNumber;
       _touches.add(playerNumber);
-      _possession = playerInfo[playerNumber]?.nickname ?? '$playerNumber';
+      _possessionDescription =
+          game.getPlayer(playerNumber)?.nickname ?? '$playerNumber';
     });
   }
 
   void _endedWith(EndCondition kind) {
     // TODO: add stats
     setState(() {
+      setState(() {
+        _possession = null;
+      });
+      if (_touches.isEmpty) return;
+
+      for (var playerNumber in _touches.sublist(0, _touches.length - 1)) {
+        currentGame.getPlayer(playerNumber)?.addPass();
+      }
+      currentGame
+          .getPlayer(_touches[_touches.length - 1])
+          ?.addEndCondition(kind);
+
       _touches.clear();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the TouchPage object that was created by
@@ -83,19 +86,7 @@ class _TouchPageState extends State<TouchPage> {
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
@@ -116,7 +107,7 @@ class _TouchPageState extends State<TouchPage> {
                     const GameTimer(
                       timerStyle: TextStyle(
                           fontStyle: FontStyle.italic,
-                          fontSize: 26,
+                          fontSize: 32,
                           color: Colors.white),
                     ),
                   ],
@@ -125,7 +116,9 @@ class _TouchPageState extends State<TouchPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       ...numberList.map((playerNum) => ElevatedButton(
-                            onPressed: () => _touchedBy(playerNum),
+                            onPressed: _possession == playerNum
+                                ? null
+                                : () => _touchedBy(playerNum),
                             child: Text(
                               playerNum.toString(),
                               style: Theme.of(context).textTheme.headline3,
@@ -133,7 +126,7 @@ class _TouchPageState extends State<TouchPage> {
                           ))
                     ])),
             Text(
-              'Possession $_possession',
+              '=> $_possessionDescription',
               style: Theme.of(context).textTheme.headline3,
             ),
             Text(
