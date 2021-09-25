@@ -9,8 +9,8 @@ class Player {
 
   int passes = 0;
   var counts = {
-    EndCondition.goal: 0,
     EndCondition.shot: 0,
+    EndCondition.goal: 0,
     EndCondition.turnOver: 0
   };
 
@@ -25,6 +25,15 @@ class Player {
       {int? jersey, String? nickname})
       : jersey = jersey ?? number,
         nickname = nickname ?? firstName;
+
+  String header() {
+    return 'number,firstName,lastName,passes,shots,goals,turnovers';
+  }
+
+  String stats() {
+    var statString = ([passes] + counts.values.toList()).join(',');
+    return '$number,$firstName,$lastName,$statString';
+  }
 
   subIn(double timeIn, Half half) {
     timeIn = timeIn;

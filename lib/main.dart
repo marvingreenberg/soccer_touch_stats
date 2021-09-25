@@ -58,21 +58,18 @@ class _TouchPageState extends State<TouchPage> {
     });
   }
 
-  void _endedWith(EndCondition kind) {
-    // TODO: add stats
+  void _endedWith(EndCondition kind) async {
+    _possession = null;
+    if (_touches.isEmpty) return;
+
+    for (var playerNumber in _touches.take(_touches.length - 1)) {
+      game.getPlayer(playerNumber)?.addPass();
+    }
+    game.getPlayer(_touches.last)?.addEndCondition(kind);
+
+    await game.write();
+
     setState(() {
-      setState(() {
-        _possession = null;
-      });
-      if (_touches.isEmpty) return;
-
-      for (var playerNumber in _touches.sublist(0, _touches.length - 1)) {
-        currentGame.getPlayer(playerNumber)?.addPass();
-      }
-      currentGame
-          .getPlayer(_touches[_touches.length - 1])
-          ?.addEndCondition(kind);
-
       _touches.clear();
     });
   }
