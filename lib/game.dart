@@ -56,6 +56,7 @@ const formation = [
 class Game {
   String description;
   Map<int, Player> playerInfo = {};
+  Player _possession = Player.noPossession;
 
   Game(this.description) {
     for (var p in arlington2005RedPlayers) {
@@ -74,10 +75,32 @@ class Game {
     return this;
   }
 
+  Player get possession {
+    return _possession;
+  }
+
+  set possession(Player player) {
+    if (_possession != Player.noPossession) {
+      _possession.passes += 1;
+    }
+    _possession = player;
+  }
+
   Iterable<Iterable<Player>> onField() {
     return formation.map((rowOfPositions) => rowOfPositions.map((position) => playerInfo.values
         .firstWhere((player) => player.position == position,
             orElse: () => Player.empty(position))));
+  }
+
+  List<List<Player>> offField() {
+    var playersOffField = playerInfo.values.where((p) => p.position == -1).toList();
+    var offset = 0;
+    List<List<Player>> offFieldGrid = [];
+    while (offset < playersOffField.length) {
+      offFieldGrid.add(playersOffField.skip(offset).take(5).toList());
+      offset += 5;
+    }
+    return offFieldGrid;
   }
 
   Player? getPlayer(int number) {
@@ -92,3 +115,5 @@ class Game {
     return file.writeAsString(stats);
   }
 }
+
+var game = Game('Today').init();

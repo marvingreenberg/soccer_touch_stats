@@ -10,10 +10,8 @@ typedef WidgetFactory = Widget Function(Player p);
 
 class OnFieldLayout extends StatefulWidget {
   final WidgetFactory playerWidgetFactory;
-  final Game game;
 
-  const OnFieldLayout({Key? key, required this.playerWidgetFactory, required this.game})
-      : super(key: key);
+  const OnFieldLayout({Key? key, required this.playerWidgetFactory}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -39,7 +37,7 @@ class _OnFieldPlayersState extends State<OnFieldLayout> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          ...widget.game
+          ...game
               .onField()
               .map((playerList) => Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
                     ...playerList.map(

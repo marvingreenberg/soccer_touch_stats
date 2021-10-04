@@ -27,6 +27,8 @@
 
 // (stats not used for rendeting)
 // ignore: must_be_immutable
+// import 'package:flutter/material.dart';
+
 class Player {
   final String firstName;
   final String lastName;
@@ -74,6 +76,8 @@ class Player {
 
   Player.empty(int position)
       : this(firstName: '', lastName: '', number: -position, position: position, positions: []);
+
+  static var noPossession = Player.empty(-1);
 
   Player(
       {required this.firstName,
