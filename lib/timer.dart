@@ -2,7 +2,7 @@
 import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:soccer_touch_stats/touch_page.dart';
+import './touch_page.dart';
 
 const oneSecond = Duration(seconds: 1);
 
@@ -27,7 +27,8 @@ class TimeBounds {
 }
 
 String pad(int timefield, {String padChar = '0'}) {
-  return (padChar + timefield.toString()).substring(1, 3);
+  var offset = timefield > 9 ? 1 : 0;
+  return (padChar + timefield.toString()).substring(offset, offset + 2);
 }
 
 class GameTimer extends StatefulWidget {
@@ -48,21 +49,43 @@ class _TimerState extends State<GameTimer> {
   var periods = [TimeBounds(), TimeBounds()];
   int half = 0;
   String _timerDisplay = '00:00';
+  Timer? dartTimer;
 
   _TimerState();
+
   void stopTimer() {
+    dartTimer?.cancel();
+    if (half > 1) return;
     widget.touchPageState.isRunning = false;
-    var tb = periods[half];
-    tb.end();
-    half = 1;
+    periods[half].end();
+    half += 1;
+  }
+
+  void halfTransition() {
+    if (half > 1) return;
+    setState(() {
+      if (half == 0) {
+        if (!widget.touchPageState.isRunning) {
+          startTimer();
+        } else {
+          stopTimer();
+        }
+      } else {
+        if (!widget.touchPageState.isRunning) {
+          widget.touchPageState.isRunning = true;
+        } else {
+          widget.touchPageState.isRunning = false;
+          half = 2;
+        }
+      }
+    });
   }
 
   // repeatedly pressing start changes the start
   void startTimer() {
-    if (widget.touchPageState.isRunning) return;
     periods[half].start();
 
-    Timer.periodic(oneSecond, (Timer t) {
+    dartTimer = Timer.periodic(oneSecond, (Timer t) {
       if (!widget.touchPageState.isRunning) t.cancel();
       updateTimerDisplay();
     });
@@ -76,8 +99,9 @@ class _TimerState extends State<GameTimer> {
     Duration elapsed = periods[0].duration + periods[1].duration;
     int minutes = (elapsed.inSeconds / 60).floor();
     int seconds = elapsed.inSeconds.remainder(60);
+    if (!mounted) return;
     setState(() {
-      _timerDisplay = '${pad(minutes, padChar: ' ')}:${pad(seconds)}';
+      _timerDisplay = '${pad(minutes)}:${pad(seconds)}';
     });
   }
 
@@ -85,6 +109,31 @@ class _TimerState extends State<GameTimer> {
   void didUpdateWidget(GameTimer oldWidget) {
     print('something happened');
     super.didUpdateWidget(oldWidget);
+  }
+
+  static var colorSequence = [
+    Colors.red.shade900,
+    Colors.black,
+    Colors.grey,
+    Colors.black,
+    Colors.blue.shade900
+  ];
+
+  static final _halfIcons = [Icons.looks_one, Icons.looks_two];
+
+  List<Icon> halfIcons() {
+    return [0, 1]
+        .map((i) => Icon(_halfIcons[i],
+            size: 16,
+            color: (i == half && widget.touchPageState.isRunning)
+                ? Colors.lightGreenAccent[400]
+                : Colors.grey[300]))
+        .toList();
+  }
+
+  Color buttonColor() {
+    var index = half * 2 + (widget.touchPageState.isRunning ? 1 : 0);
+    return colorSequence[index];
   }
 
   @override
@@ -96,14 +145,17 @@ class _TimerState extends State<GameTimer> {
     ]);
 
     return Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: <Widget>[
+      Column(children: [
+        Row(children: [Text(_timerDisplay, style: timerStyle)]),
+        Row(children: halfIcons())
+      ]),
       IconButton(
-        onPressed: startTimer,
-        color: widget.touchPageState.isRunning ? Colors.black : Colors.red,
+        onPressed: halfTransition,
+        color: buttonColor(),
         iconSize: 24.0,
         icon: const Icon(Icons.play_circle),
         padding: const EdgeInsets.symmetric(horizontal: 4.0),
       ),
-      Text(_timerDisplay, style: timerStyle)
     ]);
   }
 }

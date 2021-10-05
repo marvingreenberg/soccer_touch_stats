@@ -3,10 +3,6 @@ import 'package:soccer_touch_stats/player_widget_functions.dart';
 import './game.dart';
 import './player.dart';
 
-Widget makeDraggabletestWidget(Player p) {
-  return Text(p.nickname);
-}
-
 typedef WidgetFactory = Widget Function(Player p);
 
 class OffFieldLayout extends StatefulWidget {

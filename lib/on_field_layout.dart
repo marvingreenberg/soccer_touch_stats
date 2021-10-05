@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:soccer_touch_stats/game.dart';
 import './player.dart';
 
-Widget dragTargetPlayer(Player p) {
-  return const Text('hey');
-}
-
 typedef WidgetFactory = Widget Function(Player p);
 
 class OnFieldLayout extends StatefulWidget {

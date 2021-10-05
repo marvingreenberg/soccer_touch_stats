@@ -25,7 +25,7 @@ class GameSetupPageState extends State<GameSetupPage> {
     Widget Function(Player) makeDragTarget = playerAsDragTarget(context);
     return Center(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           OnFieldLayout(playerWidgetFactory: makeDragTarget),

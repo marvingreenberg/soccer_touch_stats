@@ -3,7 +3,6 @@ import './timer.dart';
 import './game.dart';
 import './player.dart';
 import 'on_field_layout.dart';
-import './player_widget_functions.dart';
 
 class TouchPage extends StatefulWidget {
   const TouchPage({Key? key, required this.title}) : super(key: key);
@@ -55,13 +54,39 @@ class TouchPageState extends State<TouchPage> {
     _reset();
   }
 
+  void _touched(Player p) {
+    setState(() {
+      game.possession = p;
+    });
+  }
+
   void writeStats() async {
     await game.write();
   }
 
+  Widget Function(Player) playerAsButton(BuildContext context) {
+    return (Player p) {
+      return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 5),
+          child: ElevatedButton(
+            onPressed: game.possession == p || !isRunning
+                ? null
+                : () {
+                    _touched(p);
+                  },
+            child: Tooltip(
+                message: p.nickname,
+                child: Text(
+                  p.toString(),
+                  style: Theme.of(context).textTheme.headline4,
+                )),
+          ));
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
-    Widget Function(Player) makeButton = playerAsButtonFn(context);
+    Widget Function(Player) makeButton = playerAsButton(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -69,7 +94,7 @@ class TouchPageState extends State<TouchPage> {
         children: <Widget>[
           Container(
               padding: const EdgeInsets.fromLTRB(20.0, 5.0, 20.0, 5.0),
-              color: Colors.greenAccent,
+              color: Colors.teal[900],
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -95,7 +120,7 @@ class TouchPageState extends State<TouchPage> {
           ),
           Container(
               padding: const EdgeInsets.fromLTRB(40.0, 5.0, 40.0, 5.0),
-              color: Colors.amber,
+              color: Colors.deepOrange[900],
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

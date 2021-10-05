@@ -53,7 +53,7 @@ class _AppPageSelectionWidgetState extends State<AppPageSelectionWidget> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.compare_arrows_outlined),
+            icon: Icon(Icons.swap_horizontal_circle),
             label: 'OnField',
           ),
           BottomNavigationBarItem(
@@ -61,7 +61,7 @@ class _AppPageSelectionWidgetState extends State<AppPageSelectionWidget> {
             label: 'Play',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.stop),
+            icon: Icon(Icons.settings),
             label: 'Setup',
           ),
         ],
