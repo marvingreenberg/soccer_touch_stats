@@ -53,6 +53,15 @@ class _TimerState extends State<GameTimer> {
 
   _TimerState();
 
+  @override
+  void dispose() {
+    if (dartTimer != null) {
+      dartTimer!.cancel();
+      dartTimer = null;
+    }
+    super.dispose();
+  }
+
   void stopTimer() {
     dartTimer?.cancel();
     if (half > 1) return;
@@ -81,14 +90,19 @@ class _TimerState extends State<GameTimer> {
     });
   }
 
-  // repeatedly pressing start changes the start
-  void startTimer() {
-    periods[half].start();
-
+  void startUpdating() {
+    if (dartTimer != null) return;
     dartTimer = Timer.periodic(oneSecond, (Timer t) {
       if (!widget.touchPageState.isRunning) t.cancel();
       updateTimerDisplay();
     });
+  }
+
+  // repeatedly pressing start changes the start
+  void startTimer() {
+    periods[half].start();
+
+    startUpdating();
 
     setState(() {
       widget.touchPageState.isRunning = true;
@@ -99,7 +113,7 @@ class _TimerState extends State<GameTimer> {
     Duration elapsed = periods[0].duration + periods[1].duration;
     int minutes = (elapsed.inSeconds / 60).floor();
     int seconds = elapsed.inSeconds.remainder(60);
-    if (!mounted) return;
+
     setState(() {
       _timerDisplay = '${pad(minutes)}:${pad(seconds)}';
     });
@@ -107,7 +121,8 @@ class _TimerState extends State<GameTimer> {
 
   @override
   void didUpdateWidget(GameTimer oldWidget) {
-    print('something happened');
+    print('Restart updating');
+    startUpdating();
     super.didUpdateWidget(oldWidget);
   }
 

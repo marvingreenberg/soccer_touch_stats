@@ -13,15 +13,13 @@ class TouchPage extends StatefulWidget {
 }
 
 class TouchPageState extends State<TouchPage> {
-  bool _isRunning = false;
-
   bool get isRunning {
-    return _isRunning;
+    return game.isRunning;
   }
 
   set isRunning(bool v) {
     setState(() {
-      _isRunning = v;
+      game.isRunning = v;
     });
   }
 
