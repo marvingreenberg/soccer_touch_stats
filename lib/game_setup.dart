@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import './game.dart';
-import './player.dart';
 import './on_field_layout.dart';
 import './off_field_layout.dart';
 
@@ -22,7 +21,8 @@ class GameSetupPageState extends State<GameSetupPage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget Function(Player) makeDragTarget = playerAsDragTarget(context);
+    var makeDragTarget = playerAsDragTarget(context);
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,

@@ -23,6 +23,24 @@ class TouchPageState extends State<TouchPage> {
     });
   }
 
+  @override
+  void activate() {
+    super.activate();
+    print('touch page activate $mounted $isRunning');
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    print('touch page deactivate $mounted $isRunning');
+  }
+
+  @override
+  void didUpdateWidget(covariant TouchPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print('touch page didUpdateWidget $mounted $isRunning');
+  }
+
   void startClock() {
     isRunning = true;
   }
@@ -62,8 +80,8 @@ class TouchPageState extends State<TouchPage> {
     await game.write();
   }
 
-  Widget Function(Player) playerAsButton(BuildContext context) {
-    return (Player p) {
+  Widget Function(Player, {void Function()? trigger}) playerAsButton(BuildContext context) {
+    return (Player p, {void Function()? trigger}) {
       return Padding(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 5),
           child: ElevatedButton(
@@ -84,7 +102,8 @@ class TouchPageState extends State<TouchPage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget Function(Player) makeButton = playerAsButton(context);
+    print('touch page build $mounted $isRunning');
+    Widget Function(Player, {void Function()? trigger}) makeButton = playerAsButton(context);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

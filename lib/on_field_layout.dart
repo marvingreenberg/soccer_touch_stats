@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:soccer_touch_stats/game.dart';
 import './player.dart';
 
-typedef WidgetFactory = Widget Function(Player p);
+typedef WidgetFactory = Widget Function(Player p, {void Function()? trigger});
 
 class OnFieldLayout extends StatefulWidget {
   final WidgetFactory playerWidgetFactory;
@@ -26,6 +26,10 @@ class _OnFieldPlayersState extends State<OnFieldLayout> {
     });
   }
 
+  void redraw() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -37,7 +41,7 @@ class _OnFieldPlayersState extends State<OnFieldLayout> {
               .onField()
               .map((playerList) => Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
                     ...playerList.map(
-                      (player) => widget.playerWidgetFactory(player),
+                      (player) => widget.playerWidgetFactory(player, trigger: redraw),
                     )
                   ])),
         ],

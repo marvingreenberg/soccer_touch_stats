@@ -3,28 +3,9 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import './touch_page.dart';
+import './game.dart';
 
 const oneSecond = Duration(seconds: 1);
-
-const zeroDuration = Duration(seconds: 0);
-
-class TimeBounds {
-  DateTime? _start;
-  DateTime? _end;
-
-  void start() {
-    _start = DateTime.now();
-  }
-
-  void end() {
-    _end = DateTime.now();
-  }
-
-  Duration get duration {
-    if (_start == null) return zeroDuration;
-    return (_end ?? DateTime.now()).difference(_start!);
-  }
-}
 
 String pad(int timefield, {String padChar = '0'}) {
   var offset = timefield > 9 ? 1 : 0;
@@ -46,12 +27,24 @@ class GameTimer extends StatefulWidget {
 }
 
 class _TimerState extends State<GameTimer> {
-  var periods = [TimeBounds(), TimeBounds()];
-  int half = 0;
-  String _timerDisplay = '00:00';
   Timer? dartTimer;
+  String _timerDisplay = '00:00';
 
-  _TimerState();
+  _TimerState() {
+    print('new _TimerState');
+  }
+
+  int get half {
+    return game.half;
+  }
+
+  set half(value) {
+    game.half = value;
+  }
+
+  List<TimeBounds> get periods {
+    return game.periods;
+  }
 
   @override
   void dispose() {
@@ -126,24 +119,29 @@ class _TimerState extends State<GameTimer> {
     super.didUpdateWidget(oldWidget);
   }
 
-  static var colorSequence = [
-    Colors.red.shade900,
-    Colors.black,
-    Colors.grey,
-    Colors.black,
-    Colors.blue.shade900
+  static final red = Colors.redAccent;
+  static final grey = Colors.grey[300] ?? Colors.grey;
+  static final blue = Colors.blue.shade900;
+  static final black = Colors.black54;
+  static final green = Colors.lightGreenAccent[400] ?? Colors.green;
+
+  static List<Color> colorSequence = [red, black, grey, black, blue];
+
+  static final _halfIconColors = [
+    [grey, grey],
+    [green, grey],
+    [red, grey],
+    [red, green],
+    [red, red],
   ];
 
-  static final _halfIcons = [Icons.looks_one, Icons.looks_two];
-
   List<Icon> halfIcons() {
-    return [0, 1]
-        .map((i) => Icon(_halfIcons[i],
-            size: 16,
-            color: (i == half && widget.touchPageState.isRunning)
-                ? Colors.lightGreenAccent[400]
-                : Colors.grey[300]))
-        .toList();
+    var index = half * 2 + (widget.touchPageState.isRunning ? 1 : 0);
+    var _colors = _halfIconColors[index];
+    return [
+      Icon(Icons.looks_one, size: 18, color: _colors[0]),
+      Icon(Icons.looks_two, size: 18, color: _colors[1])
+    ];
   }
 
   Color buttonColor() {

@@ -16,7 +16,31 @@ class OffFieldLayout extends StatefulWidget {
 
 class _OffFieldLayoutsState extends State<OffFieldLayout> {
   @override
+  void activate() {
+    super.activate();
+    print('off field layout activate $mounted');
+  }
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    print('off field layout deactivate $mounted');
+  }
+
+  @override
+  void didUpdateWidget(covariant OffFieldLayout oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print('off field layout didUpdateWidget $mounted');
+  }
+
+  void redraw() {
+    print('off field layout redraw $mounted');
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print('off field layout build $mounted');
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -24,21 +48,9 @@ class _OffFieldLayoutsState extends State<OffFieldLayout> {
         children: <Widget>[
           ...game.offField().map((playerList) => Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [...playerList.map(playerAsDraggable(context))])),
+              children: [...playerList.map(playerAsDraggable(context, trigger: redraw))])),
         ],
       ),
     );
   }
 }
-
-// Draggable<int>(
-//           // Data is the value this Draggable stores.
-//           data: 10,
-//           child: Container(
-//             height: 100.0,
-//             width: 100.0,
-//             color: Colors.lightGreenAccent,
-//             child: const Center(
-//               child: Text('Draggable'),
-//             ),
-//           )
