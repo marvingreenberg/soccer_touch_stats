@@ -77,19 +77,17 @@ class Game {
   String description;
   Map<int, Player> playerInfo = {};
   Player _possession = Player.noPossession;
-  var _isRunning = false;
+  var isRunning = false;
   var periods = [TimeBounds(), TimeBounds()];
   int half = 0;
 
   Game(this.description) {
-    print('new Game()');
     for (var p in arlington2005RedPlayers) {
       playerInfo[p.number] = p;
     }
   }
 
   Game init() {
-    print('Game init');
     var players = playerInfo.values.iterator;
     for (var row in formation) {
       for (var position in row) {
@@ -98,15 +96,6 @@ class Game {
       }
     }
     return this;
-  }
-
-  bool get isRunning {
-    return _isRunning;
-  }
-
-  set isRunning(bool v) {
-    print('set isRunning $v');
-    _isRunning = v;
   }
 
   Player get possession {

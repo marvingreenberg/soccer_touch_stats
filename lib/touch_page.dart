@@ -26,19 +26,16 @@ class TouchPageState extends State<TouchPage> {
   @override
   void activate() {
     super.activate();
-    print('touch page activate $mounted $isRunning');
   }
 
   @override
   void deactivate() {
     super.deactivate();
-    print('touch page deactivate $mounted $isRunning');
   }
 
   @override
   void didUpdateWidget(covariant TouchPage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    print('touch page didUpdateWidget $mounted $isRunning');
   }
 
   void startClock() {
@@ -102,7 +99,6 @@ class TouchPageState extends State<TouchPage> {
 
   @override
   Widget build(BuildContext context) {
-    print('touch page build $mounted $isRunning');
     Widget Function(Player, {void Function()? trigger}) makeButton = playerAsButton(context);
     return Center(
       child: Column(

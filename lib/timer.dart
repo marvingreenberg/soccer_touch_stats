@@ -30,9 +30,7 @@ class _TimerState extends State<GameTimer> {
   Timer? dartTimer;
   String _timerDisplay = '00:00';
 
-  _TimerState() {
-    print('new _TimerState');
-  }
+  _TimerState();
 
   int get half {
     return game.half;
@@ -114,7 +112,6 @@ class _TimerState extends State<GameTimer> {
 
   @override
   void didUpdateWidget(GameTimer oldWidget) {
-    print('Restart updating');
     startUpdating();
     super.didUpdateWidget(oldWidget);
   }
