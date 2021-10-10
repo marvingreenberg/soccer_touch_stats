@@ -28,7 +28,6 @@ class GameTimer extends StatefulWidget {
 
 class _TimerState extends State<GameTimer> {
   Timer? dartTimer;
-  String _timerDisplay = '00:00';
 
   _TimerState();
 
@@ -37,7 +36,9 @@ class _TimerState extends State<GameTimer> {
   }
 
   set half(value) {
-    game.half = value;
+    setState(() {
+      game.half = value;
+    });
   }
 
   List<TimeBounds> get periods {
@@ -53,67 +54,56 @@ class _TimerState extends State<GameTimer> {
     super.dispose();
   }
 
-  void stopTimer() {
+  void _stopTimer() {
+    print('_stopTimer');
     dartTimer?.cancel();
+    dartTimer = null;
     if (half > 1) return;
     widget.touchPageState.isRunning = false;
     periods[half].end();
     half += 1;
   }
 
-  void halfTransition() {
-    if (half > 1) return;
-    setState(() {
-      if (half == 0) {
-        if (!widget.touchPageState.isRunning) {
-          startTimer();
-        } else {
-          stopTimer();
-        }
-      } else {
-        if (!widget.touchPageState.isRunning) {
-          widget.touchPageState.isRunning = true;
-        } else {
-          widget.touchPageState.isRunning = false;
-          half = 2;
-        }
-      }
-    });
-  }
-
   void startUpdating() {
-    if (dartTimer != null) return;
+    print('startUpdating');
+    if (dartTimer != null || !widget.touchPageState.isRunning) return;
     dartTimer = Timer.periodic(oneSecond, (Timer t) {
-      if (!widget.touchPageState.isRunning) t.cancel();
       updateTimerDisplay();
     });
   }
 
   // repeatedly pressing start changes the start
-  void startTimer() {
+  void _startTimer() {
+    print('_startTimer');
     periods[half].start();
-
     startUpdating();
+    widget.touchPageState.isRunning = true;
+  }
 
+  void halfTransition() {
+    print('halfTransition');
+    if (half > 1) return;
     setState(() {
-      widget.touchPageState.isRunning = true;
+      if (widget.touchPageState.isRunning) {
+        _stopTimer();
+      } else {
+        _startTimer();
+      }
     });
   }
 
-  void updateTimerDisplay() {
+  String get timerDisplay {
     Duration elapsed = periods[0].duration + periods[1].duration;
     int minutes = (elapsed.inSeconds / 60).floor();
     int seconds = elapsed.inSeconds.remainder(60);
-
-    setState(() {
-      _timerDisplay = '${pad(minutes)}:${pad(seconds)}';
-    });
+    return '${pad(minutes)}:${pad(seconds)}';
   }
 
-  @override
-  void didUpdateWidget(GameTimer oldWidget) {
-    startUpdating();
-    super.didUpdateWidget(oldWidget);
+  void updateTimerDisplay() {
+    // redraw timer every second, when running
+    setState(() {
+      print(timerDisplay);
+    });
   }
 
   static final red = Colors.redAccent;
@@ -148,6 +138,7 @@ class _TimerState extends State<GameTimer> {
 
   @override
   Widget build(BuildContext context) {
+    startUpdating();
     TextStyle _bodyText =
         Theme.of(context).textTheme.headline4 ?? const TextStyle(fontFamily: 'Courier');
     var timerStyle = _bodyText.copyWith(fontFeatures: [
@@ -156,7 +147,7 @@ class _TimerState extends State<GameTimer> {
 
     return Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: <Widget>[
       Column(children: [
-        Row(children: [Text(_timerDisplay, style: timerStyle)]),
+        Row(children: [Text(timerDisplay, style: timerStyle)]),
         Row(children: halfIcons())
       ]),
       IconButton(

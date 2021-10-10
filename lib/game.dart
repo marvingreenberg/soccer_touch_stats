@@ -53,23 +53,24 @@ const formation = [
   [P1]
 ];
 
-const zeroDuration = Duration(seconds: 0);
-
 class TimeBounds {
-  DateTime? _start;
-  DateTime? _end;
+  int half;
+  DateTime? startTime;
+  DateTime? endTime;
+
+  TimeBounds(this.half);
 
   void start() {
-    _start = DateTime.now();
+    startTime = DateTime.now();
   }
 
   void end() {
-    _end = DateTime.now();
+    endTime = DateTime.now();
   }
 
   Duration get duration {
-    if (_start == null) return zeroDuration;
-    return (_end ?? DateTime.now()).difference(_start!);
+    if (startTime == null) return Duration.zero;
+    return (endTime ?? DateTime.now()).difference(startTime!);
   }
 }
 
@@ -78,7 +79,7 @@ class Game {
   Map<int, Player> playerInfo = {};
   Player _possession = Player.noPossession;
   var isRunning = false;
-  var periods = [TimeBounds(), TimeBounds()];
+  var periods = [TimeBounds(0), TimeBounds(1)];
   int half = 0;
 
   Game(this.description) {

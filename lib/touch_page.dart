@@ -5,8 +5,7 @@ import './player.dart';
 import 'on_field_layout.dart';
 
 class TouchPage extends StatefulWidget {
-  const TouchPage({Key? key, required this.title}) : super(key: key);
-  final String title;
+  const TouchPage({Key? key}) : super(key: key);
 
   @override
   State<TouchPage> createState() => TouchPageState();

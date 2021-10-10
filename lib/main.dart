@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:soccer_touch_stats/configuration.dart';
 import 'package:soccer_touch_stats/game_setup.dart';
 import './touch_page.dart';
 
@@ -31,8 +32,8 @@ class _AppPageSelectionWidgetState extends State<AppPageSelectionWidget> {
   int _selectedIndex = 0;
   static const List<Widget> _appWidgetPanes = <Widget>[
     GameSetupPage(title: 'Setup and Substitutions'),
-    TouchPage(title: 'Soccer Touch Tracker'),
-    TouchPage(title: 'Soccer Touch Tracker'),
+    TouchPage(),
+    Configuration(),
   ];
 
   void _onItemTapped(int index) {
